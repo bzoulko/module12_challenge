@@ -1,0 +1,25 @@
+{
+  "name": "module12_challenge",
+  "version": "1.0.0",
+  "description": "SQL Challenge: Employee Tracker",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "createdb": "source schema.sql"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bzoulko/module12_challenge.git"
+  },
+  "author": "Brian Zoulko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bzoulko/module12_challenge/issues"
+  },
+  "homepage": "https://github.com/bzoulko/module12_challenge#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^8.2.4",
+    "mysql2": "^2.3.3"
+  }
+}
