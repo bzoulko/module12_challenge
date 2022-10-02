@@ -27,14 +27,54 @@ const FLD_LEN = 38;
 
 // Create the connection to database
 const DATABASE = 'employee_tracker_db';
-const connection = mySQL.createConnection({
+var connection = mySQL.createConnection({
   host: 'localhost',
   user: 'bootcamp',
   database: DATABASE
   },
-
-  console.log(`Connected Employee Tracker Database.`)
-
 );
 
-console.log("process ran...");
+// Select Statement.
+function select(table) {
+  return(`SELECT * FROM ${table}`);
+}
+
+// Make sure the database is connected.
+connection.connect(function(err) {
+  if (err) throw err;
+  console.log(`Connected to Employee Tracker Database.`);
+
+
+  // Query Department table.
+  connection.query(select("department"), function (err, result) {
+    if (err) throw err;
+    
+    // Display List of Employees
+    console.log(conTable.getTable(result));    
+  });
+  
+
+  // Query Role table.
+  connection.query(select("role"), function (err, result) {
+    if (err) throw err;
+    
+    // Display List of Employees
+    console.log(conTable.getTable(result));    
+  });
+
+
+  // Query Employee table.
+  connection.query(select("employee"), function (err, result) {
+    if (err) throw err;
+    
+    let employees = result;
+    employees.forEach(employee => {
+      console.log("employee: " + JSON.stringify(employee));
+      console.log("\tmanager_id: " + employee.manager_id);
+    });
+
+    // Display List of Employees
+    console.log(conTable.getTable(result));    
+  });
+
+});

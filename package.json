@@ -4,8 +4,7 @@
   "description": "SQL Challenge: Employee Tracker",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "createdb": "source schema.sql"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
