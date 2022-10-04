@@ -269,7 +269,7 @@ async function cliMainMenu() {
 
         case "View All Departments":
           // Get a list of departments.
-          await runQuery(`SELECT * FROM department`,"LOG");
+          await runQuery(`SELECT * FROM department;`,"LOG");
           break;
 
         case "Add Department":
@@ -333,7 +333,7 @@ async function cliMainMenu() {
         // Insert new department.
         if (dept) {
           console.log("New department: " + dept);
-          await runQuery(`INSERT into department(name) values ("${dept}")`);
+          await runQuery(`INSERT into department(name) values ("${dept}");`);
           await runQuery('OPTIMIZE TABLE department;');
           console.log("Added " + dept + " to the database");
         } else {
@@ -368,7 +368,7 @@ async function cliMainMenu() {
 
         // Insert new role.
         if (title && salary && dept) {
-          await runQuery(`INSERT into role(title, salary, department_id) values ("${title}",${salary},${ids[0]})`);
+          await runQuery(`INSERT into role(title, salary, department_id) values ("${title}",${salary},${ids[0]});`);
           await runQuery('OPTIMIZE TABLE role;');
           console.log("Added " + title + " to the database");
         } else {
@@ -409,7 +409,7 @@ async function cliMainMenu() {
 
         // Insert new employee.
         if (fname && lname && title && mgr) {
-          await runQuery(`INSERT into employee(first_name, last_name, role_id, manager_id) values ("${fname}","${lname}",${rIds[0]},${mIds[0]})`);
+          await runQuery(`INSERT into employee(first_name, last_name, role_id, manager_id) values ("${fname}","${lname}",${rIds[0]},${mIds[0]});`);
           await runQuery('OPTIMIZE TABLE employee;');
           console.log("Added " + fname + " " + lname + " to the database");
         } else {
@@ -443,7 +443,7 @@ async function cliMainMenu() {
 
         // Insert new role.
         if (employee && title) {
-          await runQuery(`UPDATE employee SET role_id = ${rIds[0]} where first_name="${employee[0]}" and last_name="${employee[1]}"`);
+          await runQuery(`UPDATE employee SET role_id = ${rIds[0]} where first_name="${employee[0]}" and last_name="${employee[1]}";`);
           await runQuery('OPTIMIZE TABLE employee;');
           console.log("Updated employee's role");
         } else {
