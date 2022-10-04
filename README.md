@@ -3,7 +3,7 @@ This program is a CLI application using node.js to run it. After starting the ap
 
 
 ## Running the Employee Tracker.
-* From the Terminal prompt, in this projects main folder, type "npm start". This will start the Employee Tracker application that will being prompting with this question, <b>"What would you like to do?"<b> and a menu of options to choose from.
+* From the Terminal prompt, in this projects main folder, type "npm start". This will start the Employee Tracker application that will being prompting with this question, <b>"What would you like to do?"</b> and a menu of options to choose from.
     - "View All Employees" : Lists all employees available.
 
     - "Add Employee" : Add a new employee to the table of employee's, you'll be prompted for additional questions.
