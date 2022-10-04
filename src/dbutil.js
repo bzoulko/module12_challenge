@@ -15,7 +15,7 @@ const mySQL = require('mysql2');        // Attach to mySQL database.
  * Setup a thread pool for query selections.
  */
 const pool = mySQL.createPool({
-    connectionLimit: 20,
+    connectionLimit: 10,
     host: 'localhost',
     user: 'bootcamp',
     password: '',
