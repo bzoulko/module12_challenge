@@ -20,7 +20,14 @@ const printBlueBkgrndText = (text) => `\x1b[44m${text}\x1b[0m`;
 const printUnderLineText  = (text) => `\x1b[4m\x1b[33m${text}\x1b[0m`;
 const printRedText        = (text) => `\x1b[31m${text}\x1b[0m`; 
 const printYellowText     = (text) => `\x1b[33m${text}\x1b[0m`;
-const mainMenu = [
+const FLD_LEN             = 50;
+const roles               = [
+  "Engineering",
+  "Finance",
+  "Legal",
+  "Sales"
+];
+const mainMenu            = [
   new inquirer.Separator(),
   "View All Employees",
   "Add Employee",
@@ -30,7 +37,7 @@ const mainMenu = [
   "View All Departments",
   "Add Department",
   new inquirer.Separator(),
-  "Quit"
+  printRedText("Quit")
 ];
 
 
@@ -47,46 +54,113 @@ const menuPrompt = () => {
 };
 
 
-// // Sync/Await processing along side promise to ensure sequential processing.
-// async function runQuery (query) {
-//   try{
+// Setup Adding Role Prompt
+const addRolePrompt = async () => {
 
-//     // Get a list roles.
-//     const roles = await dbQuery.Select(`SELECT * FROM role`);
-//     console.log("\n\n Role");
-//     console.log(conTable.getTable(roles));    
+  // Preload role choices before prompting.
+  const results = await runQuery("SELECT name from department;", "GET");
+  const depts = [];
+  results.forEach(dept => depts.push(JSON.stringify(dept.name)));
 
-//     // Get a list of Employees.
-//     const employees = await dbQuery.Select(`SELECT * FROM employee`);
-//     console.log("\n\n Employee");
-//     console.log(conTable.getTable(employees));
+  return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'name',
+      message: `What is the name of the role? `.padStart(FLD_LEN),
+    },
+    {
+      type: 'input',
+      name: 'salary',
+      message: `What is the salary of the role? `.padStart(FLD_LEN),
+      validate: function (salary) {
+        valid = !(/\D/.test(salary));
+        if (valid) return true;
+        console.log(".  " + printRedText("Salary must be numeric."));
+        return false;
+      }
+    },
+    {
+      type: "list",
+      name: "dept",
+      message: "Which department does the role belong to?",
+      choices: depts,
+    },
+  ]);
+};
 
-//     // Get managers name for each employee.
-//     for (var x = 0; x < employees.length; x++) {    
 
-//       // Search through all employees with a valid manager's id to obtain
-//       // that employees full name.
-//       let employee = employees[x];
-//       if (employee.manager_id !== null) {
-//         const emps = await dbQuery.Select("SELECT *, CONCAT(first_name,' ',last_name) as full_name FROM employee where id = " + employee.manager_id + ";");
-//         emps.forEach(emp => employee.manager_name = emp.full_name);
-//       }
+// Setup Add Department Prompt
+const addDeptPrompt = () => {
 
-//       // Update table array/object with employee managers name.
-//       employees[x] = employee;
-//     };
+  return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'dept',
+      message: `What is the name of the department? `.padStart(FLD_LEN),
+    },
+  ]);
+};
 
-//     console.log("\n\n Updated Employee");
-//     console.log(conTable.getTable(employees));
 
-//   } catch(error){
+// Setup Adding Role Prompt
+const addEmployeePrompt = () => {
+  return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'fname',
+      message: `What is the employee's first name? `.padStart(FLD_LEN),
+    },
+    {
+      type: 'input',
+      name: 'lname',
+      message: `What is the employee's last name? `.padStart(FLD_LEN),
+    },
+    {
+      type: "list",
+      name: "role",
+      message: "What is the employee's role?",
+      choices: runQuery("SELECT title from role;", "GET"),
+    },
+    {
+      type: "list",
+      name: "manager",
+      message: "Who is the employee's manager?",
+      choices: runQuery("SELECT manager from managers;", "GET"),
+    },
+  ]);
+};
 
-//     console.log(error);
 
-//   }
-// }
+// Setup Adding Role Prompt
+const updateEmployeeRolePrompt = () => {
+  return inquirer.prompt([
+    {
+      type: 'list',
+      name: 'employee',
+      message: `Which employee's role do you want to update? `.padStart(FLD_LEN),
+      choices: runQuery("SELECT CONCAT(first_name,' ', last_name) as employee from employee;", "GET"),
+    },
+    {
+      type: "list",
+      name: "role",
+      message: "Which role do you want to assign the selected employee? ",
+      choices: runQuery("SELECT title from role;", "GET"),
+    },
+    {
+      type: "list",
+      name: "role",
+      message: "What is the employee's role?",
+      choices: runQuery("SELECT title from role;", "GET"),
+    },
+    {
+      type: "list",
+      name: "manager",
+      message: "Who os the employee's manager?",
+      choices: runQuery("SELECT manager from managers;", "GET"),
+    },
+  ]);
+};
 
-//runQueries();
 
 // Sync/Await processing along side promise to ensure sequential processing
 // and display results on terminal.
@@ -114,45 +188,21 @@ async function runQuery (query, type) {
 }
 
 
-
-// /**
-//  * Display All Employees.
-//  */
-// async function showEmployees() {
-//   // Get a list of Employees.
-//   //const employees = await dbQuery.Select(`SELECT * FROM employee`);
-//   const employees = await runQuery(`SELECT * FROM employee`,"GET");
-
-//   // Get managers name for each employee.
-//   for (var x = 0; x < employees.length; x++) {    
-
-//     // Search through all employees with a valid manager's id to obtain
-//     // that employees full name.
-//     let employee = employees[x];
-//     if (employee.manager_id !== null) {
-//       //const emps = await dbQuery.Select("SELECT *, CONCAT(first_name,' ',last_name) as full_name FROM employee where id = " + employee.manager_id + ";");
-//       const emps = await runQuery("SELECT *, CONCAT(first_name,' ',last_name) as full_name FROM employee where id = " + employee.manager_id + ";", "GET");
-//       emps.forEach(emp => employee.manager_name = emp.full_name);
-//     }
-
-//     // Update table array/object with employee managers name.
-//     employees[x] = employee;
-//   };
-
-//   await promptUsers(employees);
-// }
-
-
 // Display detail on console.
 async function promptUsers(results) {
   console.log("\n" + conTable.getTable(results));
 }
 
+
+/**
+ * Run individual queries to build a temporary Managers table to obtain the manager for
+ * each specific employee.
+ */
 async function showEmployees() {
-  await runQuery(`DROP TABLE IF EXISTS manager;`);
-  await runQuery(`CREATE TABLE manager (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, manager_name VARCHAR(61)) SELECT manager_id, concat(first_name,' ',last_name) as manager_name FROM employee;`);
-  await runQuery(`UPDATE manager INNER JOIN employee ON manager.id = employee.id SET manager.manager_name = CONCAT(employee.first_name, ' ', employee.last_name);`);
-  await runQuery(`SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, manager.manager_name FROM employee inner join manager on employee.manager_id = manager.id;`, "LOG");
+  await runQuery(`DROP TABLE IF EXISTS managers;`);
+  await runQuery(`CREATE TABLE managers (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, manager VARCHAR(61)) SELECT manager_id, concat(first_name,' ',last_name) as manager FROM employee;`);
+  await runQuery(`UPDATE managers INNER JOIN employee ON managers.id = employee.id SET managers.manager = CONCAT(employee.first_name, ' ', employee.last_name);`);
+  await runQuery(`SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name as department, role.salary, managers.manager FROM employee inner join role on employee.id = role.id inner join department on department.id = role.department_id left join managers on employee.manager_id = managers.id;`, "LOG");
 }
 
 
@@ -162,7 +212,7 @@ async function showEmployees() {
  * @param {*} msg 
  */
 function screenTitle(msg) {
-  clear();
+  //clear();
   console.log("*".repeat(msg.length));
   console.log(printBlueBkgrndText(msg));
   console.log("*".repeat(msg.length));
@@ -178,12 +228,12 @@ async function cliMainMenu() {
   await runQuery('OPTIMIZE TABLE employee;');
   await menuPrompt()
         
-    .then((answers) => {
+    .then(async (answers) => {
   
       switch (answers.menu) {
 
         case "View All Employees":
-          showEmployees();
+          await showEmployees();
           break;
 
         case "Add Employee":
@@ -194,21 +244,23 @@ async function cliMainMenu() {
 
         case "View All Roles":
           // Get a list roles.
-          runQuery(`SELECT * FROM role`, "LOG");
+          await runQuery(`SELECT role.id, role.title, department.name as department, role.salary FROM employee inner join role on employee.id = role.id inner join department on department.id = role.department_id;`, "LOG");
           break;
 
         case "Add Role":
+          await addRole();
           break;
 
         case "View All Departments":
           // Get a list of departments.
-          runQuery(`SELECT * FROM department`,"LOG");
+          await runQuery(`SELECT * FROM department`,"LOG");
           break;
 
         case "Add Department":
+          await addDepartment();
           break;
 
-        case "Quit":
+        case printRedText("Quit"):
           process.exit(0);
           break;
         }
@@ -221,6 +273,49 @@ async function cliMainMenu() {
   
     })
     .catch((err) => console.error(err))
+  }
+  
+
+  /**
+   * 
+   */
+  async function addDepartment() {
+
+
+    await runQuery('OPTIMIZE TABLE employee;');
+    await addDeptPrompt()
+          
+      .then((answers) => {
+    
+        let dept = answers.dept.trim();
+        if (dept) 
+          console.log("New department: " + dept);
+        else
+          console.log("NO DEPARTMENT WAS ENTERED!"); 
+    
+      })
+      .catch((err) => console.error(err))
+  }
+
+  
+  async function addRole() {
+
+    await runQuery('OPTIMIZE TABLE role;');
+    await addRolePrompt()
+          
+      .then((answers) => {
+    
+        let roleName = answers.name.trim();
+        let salary   = answers.salary;
+        let dept     = answers.dept;
+
+        if (roleName) 
+          console.log("Add role: " + roleName + "   salary: " + salary + "   dept: " + dept);
+        else
+          console.log("NO ROLE WAS ENTERED!"); 
+    
+      })
+      .catch((err) => console.error(err))
   }
     
   cliMainMenu();
